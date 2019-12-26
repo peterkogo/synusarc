@@ -1,26 +1,53 @@
 import React from 'react'
-import logo from './logo.svg'
+import { connect } from 'react-redux'
+import interact from 'interactjs'
+
+import { resize } from './state/dimensions/actions'
+
 import './App.css'
 
-function App () {
-  return (
-    <div className='App'>
-      <header className='App-header'>
-        <img src={logo} className='App-logo' alt='logo' />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className='App-link'
-          href='https://reactjs.org'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  )
+import Console from './components/console/Console'
+
+class App extends React.Component {
+  state = {
+    level: 0
+  }
+
+  componentDidMount () {
+    window.addEventListener('resize', this.props.resize)
+    interact('#test').gesturable({
+      onmove: (event) => {
+        this.setState({
+          level: this.state.level + event.da * 0.8
+        })
+      }
+    })
+  }
+
+  render () {
+    return (
+      <div
+        id='App'
+        style={{
+          touchAction: 'none',
+          overflow: 'hidden',
+          background: 'black'
+        }}
+        onClick={() => { this.setState({ level: this.state.level + 1 }) }}
+      >
+        <Console
+          level={this.state.level}
+          display
+          transitioning
+          dispatch={() => {}}
+        />
+      </div>
+    )
+  }
 }
 
-export default App
+const mapDispatchToProps = {
+  resize
+}
+
+export default connect(null, mapDispatchToProps)(App)
